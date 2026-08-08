@@ -1,0 +1,1380 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FRIENDS PICKLEBALL CLUB - Trang Chủ & Quản Lý CLB</title>
+    <meta name="description" content="Hệ thống web quản lý câu lạc bộ Pickleball chuyên nghiệp: thành viên, bảng xếp hạng Elo 1v1 & 2v2, điểm mùa giải, tổ chức giải đấu tự động.">
+    
+    <!-- Google Fonts with full Vietnamese diacritics support -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300..900;1,300..900&family=Outfit:wght@400..900&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome Icons CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- App Stylesheet -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<!-- 0. LOGIN LANDING OVERLAY SCREEN -->
+<div class="login-overlay-screen" id="loginOverlayScreen">
+    <div class="login-modal-card">
+        <div class="login-brand-header">
+            <img src="assets/logo.jpg" alt="Logo" class="login-brand-logo" onerror="this.style.display='none';">
+            <div>
+                <h1 class="login-brand-title">FRIENDS <span>PICKLEBALL CLUB</span></h1>
+                <p class="login-brand-sub">Hệ Thống Quản Lý Câu Lạc Bộ & Bảng Xếp Hạng Elo Chuyên Nghiệp</p>
+            </div>
+        </div>
+
+        <div class="login-role-selection-grid mt-4">
+            <!-- ROLE 1: ADMIN (BAN TỔ CHỨC) -->
+            <div class="login-role-card admin-card">
+                <div class="login-role-icon text-warning"><i class="fas fa-user-shield"></i></div>
+                <h3 class="login-role-title">TÀI KHOẢN ADMIN</h3>
+                <p class="login-role-desc">Quyền Ban Tổ Chức: Sử dụng đầy đủ toàn bộ chức năng (Tạo giải đấu, nhập điểm, sửa Elo, quản lý VĐV, cài đặt...)</p>
+                <form id="adminLoginForm" onsubmit="handleAdminLogin(event)">
+                    <div class="mb-3 text-start">
+                        <label class="form-label small text-muted">Nhập Mã PIN Admin *</label>
+                        <div class="input-group">
+                            <input type="password" class="form-control" id="adminPinInput" placeholder="Nhập mã PIN Admin..." required autocomplete="off">
+                            <button class="btn btn-warning fw-bold" type="submit">
+                                <i class="fas fa-key"></i> ĐĂNG NHẬP
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <!-- ROLE 2: KHÁCH (GUEST VIEW-ONLY) -->
+            <div class="login-role-card guest-card">
+                <div class="login-role-icon text-info"><i class="fas fa-eye"></i></div>
+                <h3 class="login-role-title">TÀI KHOẢN KHÁCH</h3>
+                <p class="login-role-desc">Quyền Xem: Theo dõi Bảng xếp hạng Elo, Bục 3D Top 3, Lịch sử thi đấu, Sơ đồ giải đấu & Thống kê VĐV (Chỉ xem)</p>
+                <button class="btn btn-outline-info btn-lg w-100 fw-bold mt-2" onclick="handleGuestLogin()">
+                    <i class="fas fa-arrow-right"></i> TRUY CẬP VỚI QUYỀN KHÁCH (CHỈ XEM)
+                </button>
+            </div>
+        </div>
+
+        <div class="login-footer text-center text-muted small mt-4">
+            🔒 Hệ thống tự động phân quyền truy cập bảo mật. Mọi thông tin thi đấu được lưu giữ an toàn.
+        </div>
+    </div>
+</div>
+
+<div class="app-container">
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar" id="sidebar">
+        <div class="brand-header">
+            <img src="assets/logo.jpg" alt="Friends Pickleball Logo" class="brand-logo-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+            <div style="display: none; font-size: 2rem;">🏓</div>
+            <div>
+                <div class="brand-title">FRIENDS</div>
+                <div class="brand-subtitle">PICKLEBALL CLUB</div>
+            </div>
+        </div>
+
+        <ul class="nav-menu">
+            <li class="nav-item">
+                <a href="#" class="nav-link active" data-tab="dashboardView">
+                    <i class="fas fa-home"></i> <span>Trang chủ</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#" class="nav-link" data-tab="membersView">
+                    <i class="fas fa-users"></i> <span>Thành viên</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#" class="nav-link" data-tab="rankingsView">
+                    <i class="fas fa-trophy"></i> <span>Bảng xếp hạng</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#" class="nav-link" data-tab="tournamentsView">
+                    <i class="fas fa-bullseye"></i> <span>Giải đấu</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#" class="nav-link" data-tab="matchHistoryView">
+                    <i class="fas fa-history"></i> <span>Lịch sử thi đấu</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#" class="nav-link" data-tab="statisticsView">
+                    <i class="fas fa-chart-line"></i> <span>Thống kê</span>
+                </a>
+            </li>
+            <li class="nav-item admin-only">
+                <a href="#" class="nav-link" data-tab="settingsView">
+                    <i class="fas fa-cog"></i> <span>Cài đặt</span>
+                </a>
+            </li>
+        </ul>
+
+        <div class="sidebar-footer text-center">
+            <button class="btn btn-gold btn-sm w-100 mb-2" onclick="toggleTVMode()">
+                <i class="fas fa-tv"></i> Màn hình TV Standings
+            </button>
+            <div class="text-muted small">FRIENDS PICKLEBALL v2.2</div>
+        </div>
+    </aside>
+
+    <!-- Main Wrapper -->
+    <div class="main-wrapper">
+        <!-- Top Bar -->
+        <header class="top-bar">
+            <div class="d-flex align-items-center gap-3">
+                <button class="mobile-toggle-btn" onclick="toggleMobileSidebar()" aria-label="Toggle menu">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <div class="d-flex align-items-center gap-2 d-md-none">
+                    <img src="assets/logo.jpg" alt="Logo" style="width:32px; height:32px; border-radius:50%;">
+                    <div class="brand-title">FRIENDS CLUB</div>
+                </div>
+                <div id="userRoleBadgeContainer" class="d-flex align-items-center gap-2">
+                    <!-- Dynamic Role Badge -->
+                </div>
+            </div>
+
+            <div class="action-buttons">
+                <button class="btn btn-outline-warning btn-sm admin-only" id="globalUndoBtn" onclick="triggerGlobalUndo()" title="Hoàn tác thao tác vừa thực hiện">
+                    <i class="fas fa-undo"></i> <span class="d-none d-sm-inline">Hoàn tác</span>
+                </button>
+                <button class="btn btn-outline-primary btn-sm admin-only" onclick="exportDataJSON()" title="Xuất dữ liệu hệ thống">
+                    <i class="fas fa-download"></i> <span class="d-none d-sm-inline">Export Data</span>
+                </button>
+                <button class="btn btn-primary btn-sm admin-only" onclick="openAddMemberModal()">
+                    <i class="fas fa-plus"></i> <span>+ Thêm VĐV</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Content Body -->
+        <main class="content-body">
+            
+            <!-- 1. TRANG CHỦ (HOME PAGE) -->
+            <section id="dashboardView" class="view-section">
+                
+                <!-- Hero Banner -->
+                <div class="dash-hero-banner">
+                    <div class="dash-hero-content">
+                        <div class="dash-hero-badge"><i class="fas fa-bolt"></i> CHÀO MỪNG ĐẾN VỚI PICKLEBALL CLUB</div>
+                        <h1 class="dash-hero-title">FRIENDS PICKLEBALL CLUB</h1>
+                        <p class="dash-hero-desc">Hệ thống quản lý vận động viên, xếp hạng Elo trực tiếp (Đơn 1v1 & Đôi 2v2), tổ chức giải đấu tự động và theo dõi phong độ toàn diện.</p>
+                        <div class="dash-hero-actions">
+                            <button class="btn btn-primary" onclick="openAddTournamentModal()">
+                                <i class="fas fa-trophy"></i> + Tạo giải đấu mới
+                            </button>
+                            <button class="btn btn-gold" onclick="toggleTVMode()">
+                                <i class="fas fa-tv"></i> Bật TV Broadcast Mode
+                            </button>
+                            <button class="btn btn-outline-secondary" onclick="switchTab('rankingsView')">
+                                <i class="fas fa-list-ol"></i> Xem Bảng xếp hạng
+                            </button>
+                        </div>
+                    </div>
+                    <img src="assets/logo.jpg" alt="Pickleball Paddle Graphic" class="dash-hero-graphic d-none d-md-block">
+                </div>
+
+                <!-- KPI Bar: GIẢI ĐẤU CLB BÊN TRÁI & THÀNH VIÊN CLB BÊN PHẢI TRÊN CÙNG 1 DÒNG DUY NHẤT -->
+                <div class="card p-3 mb-4">
+                    <div class="row align-items-center g-3 text-nowrap">
+                        <!-- BÊN TRÁI: GIẢI ĐẤU CLB -->
+                        <div class="col-md-6 border-end-md">
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="kpi-icon-wrap mb-0 gold" style="background: rgba(245, 158, 11, 0.15); color: var(--accent-gold); border-color: rgba(245, 158, 11, 0.3);"><i class="fas fa-trophy"></i></div>
+                                <div class="d-flex align-items-center gap-3 flex-wrap">
+                                    <span class="kpi-title mb-0 fs-6">GIẢI ĐẤU CLB:</span>
+                                    <span class="kpi-value fs-2 text-warning" id="dashTotalTournaments">0</span>
+                                    <span class="badge badge-warning" id="dashTournamentsStatus">0 giải đang đấu</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- BÊN PHẢI: THÀNH VIÊN CLB -->
+                        <div class="col-md-6">
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="kpi-icon-wrap mb-0"><i class="fas fa-users"></i></div>
+                                <div class="d-flex align-items-center gap-3 flex-wrap">
+                                    <span class="kpi-title mb-0 fs-6">THÀNH VIÊN CLB:</span>
+                                    <span class="kpi-value fs-2" id="dashTotalMembers">0</span>
+                                    <span class="badge badge-success" id="dashActiveMembers">0 đang hoạt động</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Home Main Grid -->
+                <div class="row g-4">
+                    <div class="col-lg-8">
+                        <!-- Top 5 Standings Card -->
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <span>🔥 TOP 5 VẬN ĐỘNG VIÊN XUẤT SẮC</span>
+                                <button class="btn btn-outline-primary btn-sm" onclick="switchTab('rankingsView')">Xem BXH đầy đủ</button>
+                            </div>
+                            <div class="card-body p-0 table-responsive">
+                                <table class="table table-hover mb-0">
+                                    <thead>
+                                        <tr>
+                                            <th>Hạng</th>
+                                            <th>VĐV</th>
+                                            <th>Rating Elo</th>
+                                            <th>Tỉ lệ Thắng</th>
+                                            <th>Điểm Mùa</th>
+                                            <th>Thao tác</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="dashTop5Body">
+                                        <!-- Dynamic content -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Rating & Season Performance Chart Card -->
+                        <div class="card">
+                            <div class="card-header">📊 PHÂN TÍCH PHONG ĐỘ TOP 6 VẬN ĐỘNG VIÊN</div>
+                            <div class="card-body" style="height: 320px;">
+                                <canvas id="dashRatingChartCtx"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-4">
+                        <!-- Recent Tournament Banner Card -->
+                        <div class="mb-4" id="dashRecentTourBanner">
+                            <!-- Dynamic recent tournament card -->
+                        </div>
+
+                        <!-- Recent Match Feed Card -->
+                        <div class="card">
+                            <div class="card-header">⚡ TRẬN ĐẤU MỚI NHẤT (1V1 & 2V2)</div>
+                            <div class="card-body p-3" id="dashRecentMatchesFeed">
+                                <!-- Dynamic recent matches feed -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 2. MEMBERS VIEW -->
+            <section id="membersView" class="view-section" style="display: none;">
+                <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+                    <div>
+                        <h2 class="mb-1">👥 DANH SÁCH THÀNH VIÊN</h2>
+                        <p class="text-muted">Quản lý thông tin, ảnh đại diện, trình độ và chỉ số thành viên CLB</p>
+                    </div>
+                    <button class="btn btn-primary" onclick="openAddMemberModal()">
+                        <i class="fas fa-plus"></i> + THÊM THÀNH VIÊN
+                    </button>
+                </div>
+
+                <!-- Filter Toolbar -->
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <label class="form-label">🔎 Tìm kiếm thành viên</label>
+                                <input type="text" class="form-control" id="memberSearchInput" placeholder="Nhập tên, mã TV hoặc số ĐT..." oninput="renderMembersTable()">
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">Trình độ</label>
+                                <select class="form-select" id="memberLevelFilter" onchange="renderMembersTable()">
+                                    <option value="all">Tất cả trình độ</option>
+                                    <option value="Mới chơi">Mới chơi</option>
+                                    <option value="Trung bình">Trung bình</option>
+                                    <option value="Khá">Khá</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">Giới tính</label>
+                                <select class="form-select" id="memberGenderFilter" onchange="renderMembersTable()">
+                                    <option value="all">Tất cả giới tính</option>
+                                    <option value="male">Nam</option>
+                                    <option value="female">Nữ</option>
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label">Trạng thái</label>
+                                <select class="form-select" id="memberStatusFilter" onchange="renderMembersTable()">
+                                    <option value="all">Tất cả</option>
+                                    <option value="active">Hoạt động</option>
+                                    <option value="inactive">Tạm ngưng</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Members Table -->
+                <div class="card">
+                    <div class="card-body p-0 table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead>
+                                <tr>
+                                    <th>STT</th>
+                                    <th>Mã TV</th>
+                                    <th>Họ tên VĐV</th>
+                                    <th>Giới tính</th>
+                                    <th>Năm sinh</th>
+                                    <th>Trình độ</th>
+                                    <th>Rating</th>
+                                    <th>Xếp hạng</th>
+                                    <th>Trạng thái</th>
+                                    <th>Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody id="membersTableBody">
+                                <!-- Dynamic Content -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 3. RANKINGS VIEW -->
+            <section id="rankingsView" class="view-section" style="display: none;">
+                <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+                    <div>
+                        <h2 class="mb-1">🏆 BẢNG XẾP HẠNG FRIENDS</h2>
+                        <p class="text-muted">Xếp hạng vận động viên theo điểm Elo & điểm Mùa giải</p>
+                    </div>
+                    <div class="btn-group-sm">
+                        <button class="btn btn-gold text-dark font-bold" onclick="toggleTVMode()">
+                            <i class="fas fa-tv"></i> Bật Chế Độ TV Broadcast
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Top 3 Podium Showcase -->
+                <div id="topPodiumContainer">
+                    <!-- Dynamic Podium -->
+                </div>
+
+                <!-- Filter & Sorting Toolbar -->
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <div class="row g-3 align-items-center">
+                            <div class="col-md-4">
+                                <input type="text" class="form-control" id="rankingSearchInput" placeholder="Tìm tên VĐV..." oninput="renderRankingsTable()">
+                            </div>
+                            <div class="col-md-3">
+                                <select class="form-select" id="rankingGenderFilter" onchange="renderRankingsTable()">
+                                    <option value="all">Tất cả giới tính</option>
+                                    <option value="male">Nam</option>
+                                    <option value="female">Nữ</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <select class="form-select" id="rankingLevelFilter" onchange="renderRankingsTable()">
+                                    <option value="all">Tất cả trình độ</option>
+                                    <option value="Mới chơi">Mới chơi</option>
+                                    <option value="Trung bình">Trung bình</option>
+                                    <option value="Khá">Khá</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Rankings Table -->
+                <div class="card">
+                    <div class="card-body p-0 table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead>
+                                <tr>
+                                    <th class="text-center">Hạng</th>
+                                    <th>VĐV</th>
+                                    <th>Trình độ</th>
+                                    <th style="cursor: pointer;" onclick="setRankingSort('rating')">Rating <i class="fas fa-sort"></i></th>
+                                    <th style="cursor: pointer;" onclick="setRankingSort('recentEloDelta')">Biến động Elo gần nhất <i class="fas fa-sort"></i></th>
+                                    <th style="cursor: pointer;" onclick="setRankingSort('tournaments')">Giải đã tham gia <i class="fas fa-sort"></i></th>
+                                    <th style="cursor: pointer;" onclick="setRankingSort('matches')">Số trận <i class="fas fa-sort"></i></th>
+                                    <th style="cursor: pointer;" onclick="setRankingSort('wins')">Thắng <i class="fas fa-sort"></i></th>
+                                    <th style="cursor: pointer;" onclick="setRankingSort('losses')">Thua <i class="fas fa-sort"></i></th>
+                                    <th style="cursor: pointer;" onclick="setRankingSort('winRate')">Win Rate <i class="fas fa-sort"></i></th>
+                                </tr>
+                            </thead>
+                            <tbody id="rankingsTableBody">
+                                <!-- Dynamic Rankings Content -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Elo Calculation Guide Card -->
+                <div class="card mt-4">
+                    <div class="card-header bg-dark d-flex justify-content-between align-items-center flex-wrap gap-2">
+                        <span class="fw-bold text-white"><i class="fas fa-calculator text-warning"></i> QUY TẮC & CÔNG THỨC TÍNH ĐIỂM RATING ELO CLB</span>
+                        <button class="btn btn-outline-info btn-sm" type="button" onclick="toggleEloGuideCard()">
+                            <i class="fas fa-info-circle"></i> <span>Ẩn / Hiện hướng dẫn</span>
+                        </button>
+                    </div>
+                    <div class="card-body" id="eloGuideContent" style="display: block;">
+                        <div class="row g-4">
+                            <div class="col-md-6">
+                                <h5 class="text-warning mb-2"><i class="fas fa-flask"></i> 1. Công thức Elo Tiêu chuẩn (Đơn 1v1 & Đôi 2v2)</h5>
+                                <p class="small text-muted mb-2">Điểm Rating Elo thay đổi sau mỗi trận đấu phụ thuộc vào tương quan trình độ 2 bên và tỉ số trận đấu:</p>
+                                <div class="p-3 border rounded bg-dark font-monospace small mb-2 text-info">
+                                    <strong>ΔRating = K × M × (KếT_QUẢ - KỲ_VỌNG)</strong><br><br>
+                                    • <strong>K (K-Factor)</strong>: Mặc định 32 (Hệ số độ nhạy biến động).<br>
+                                    • <strong>M (Hệ số cách biệt tỉ số)</strong>: M = 1.0 + 0.2 × ln(|Điểm_Đội_1 - Điểm_Đội_2| + 1)<br>
+                                    • <strong>Kỳ vọng thắng</strong>: E = 1 / (1 + 10^((Elo_Đối_Thủ - Elo_Bạn) / 400))
+                                </div>
+                                <div class="small text-muted">
+                                    • <strong>Thắng trận</strong>: Được cộng điểm Elo ($\Delta R > 0$). Thắng đối thủ có Elo cao hơn sẽ nhận nhiều điểm hơn.<br>
+                                    • <strong>Thua trận</strong>: Bị trừ điểm Elo ($\Delta R < 0$) tương ứng.
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <h5 class="text-success mb-2"><i class="fas fa-users"></i> 2. Quy tắc Thể thức Đấu Đôi (2 vs 2)</h5>
+                                <ul class="small text-muted ps-3 mb-3">
+                                    <li class="mb-1"><strong>Elo Trung bình Đội</strong> = (Elo_VĐV_A + Elo_VĐV_B) / 2.</li>
+                                    <li class="mb-1">Tỉ lệ thắng kỳ vọng của Cặp đôi được tính dựa trên Elo Trung bình của 2 đội.</li>
+                                    <li class="mb-1">Mức tăng/giảm Elo ($\Delta R$) sau trận đấu được cộng/trừ đồng thời cho cả 2 VĐV trong đội.</li>
+                                </ul>
+                                <h5 class="text-gold mb-2"><i class="fas fa-trophy"></i> 3. Điểm Thưởng Mùa Giải (Season Points)</h5>
+                                <div class="d-flex flex-wrap gap-2 small">
+                                    <span class="badge badge-warning p-2">🥇 Vô địch: +100 điểm Mùa</span>
+                                    <span class="badge badge-secondary p-2">🥈 Á quân: +70 điểm Mùa</span>
+                                    <span class="badge badge-dark p-2" style="border: 1px solid #cd7f32;">🥉 Hạng 3: +50 điểm Mùa</span>
+                                    <span class="badge badge-primary p-2">Vòng bảng / Tham gia: +10 điểm Mùa</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 4. TOURNAMENTS VIEW -->
+            <section id="tournamentsView" class="view-section" style="display: none;">
+                <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+                    <div>
+                        <h2 class="mb-1">🎯 QUẢN LÝ GIẢI ĐẤU</h2>
+                        <p class="text-muted">Tổ chức giải đấu, chọn cặp Knockout (Tứ kết, Bán kết, Chung kết) & cập nhật kết quả</p>
+                    </div>
+                    <button class="btn btn-primary admin-only" onclick="openAddTournamentModal()">
+                        <i class="fas fa-trophy"></i> + TẠO GIẢI ĐẤU MỚI
+                    </button>
+                </div>
+
+                <!-- Filter Bar -->
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <select class="form-select" id="tournamentStatusFilter" onchange="renderTournamentsList()">
+                                    <option value="all">Tất cả trạng thái</option>
+                                    <option value="upcoming">Sắp diễn ra</option>
+                                    <option value="ongoing">Đang thi đấu</option>
+                                    <option value="completed">Đã kết thúc</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Detailed View Container -->
+                <div id="tournamentDetailViewContainer" class="mb-4" style="display: none;">
+                    <!-- Dynamic Tournament Details -->
+                </div>
+
+                <!-- Tournaments List Cards -->
+                <div class="row" id="tournamentsListContainer">
+                    <!-- Dynamic Cards -->
+                </div>
+            </section>
+
+            <!-- 5. MATCH HISTORY VIEW -->
+            <section id="matchHistoryView" class="view-section" style="display: none;">
+                <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+                    <div>
+                        <h2 class="mb-1">📊 LỊCH SỬ THI ĐẤU</h2>
+                        <p class="text-muted">Toàn bộ danh sách các trận đấu đã hoàn thành & biến động Elo 1v1 / 2v2</p>
+                    </div>
+                    <button class="btn btn-primary admin-only" onclick="openAddFriendlyMatchModal()">
+                        <i class="fas fa-handshake"></i> + THÊM TRẬN GIAO HỮU
+                    </button>
+                </div>
+
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <label class="form-label">Lọc theo giải đấu</label>
+                                <select class="form-select" id="matchHistoryTourFilter" onchange="renderMatchesHistoryTable()">
+                                    <option value="all">Tất cả giải đấu</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-body p-0 table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead>
+                                <tr>
+                                    <th>STT</th>
+                                    <th>Giải đấu</th>
+                                    <th>Thể thức</th>
+                                    <th>Đội 1 / VĐV 1</th>
+                                    <th class="text-center">Tỉ số</th>
+                                    <th>Đội 2 / VĐV 2</th>
+                                    <th>Thời gian</th>
+                                    <th>Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody id="matchesHistoryBody">
+                                <!-- Dynamic content -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 6. STATISTICS VIEW -->
+            <section id="statisticsView" class="view-section" style="display: none;">
+                <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+                    <div>
+                        <h2 class="mb-1">📈 THỐNG KÊ CLB</h2>
+                        <p class="text-muted">Biểu đồ phân tích quy mô thành viên, thi đấu và thứ hạng</p>
+                    </div>
+                </div>
+
+                <div class="row g-3 mb-4">
+                    <div class="col-6 col-md-3">
+                        <div class="kpi-card text-center p-3">
+                            <div class="kpi-title">TỔNG THÀNH VIÊN</div>
+                            <div class="kpi-value text-primary" id="statTotalMembers">0</div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <div class="kpi-card text-center p-3">
+                            <div class="kpi-title">ĐANG HOẠT ĐỘNG</div>
+                            <div class="kpi-value text-success" id="statActiveMembers">0</div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <div class="kpi-card text-center p-3">
+                            <div class="kpi-title">GIẢI ĐẤU ĐÃ TỔ CHỨC</div>
+                            <div class="kpi-value text-warning" id="statTotalTournaments">0</div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <div class="kpi-card text-center p-3">
+                            <div class="kpi-title">TỔNG TRẬN ĐÃ ĐẤU</div>
+                            <div class="kpi-value text-info" id="statTotalMatches">0</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row g-4">
+                    <div class="col-md-6">
+                        <div class="card h-100">
+                            <div class="card-header">PHÂN BỔ THEO TRÌNH ĐỘ (3 CẤP)</div>
+                            <div class="card-body" style="height: 300px;">
+                                <canvas id="statLevelChartCtx"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card h-100">
+                            <div class="card-header">TỈ LỆ GIỚI TÍNH</div>
+                            <div class="card-body" style="height: 300px;">
+                                <canvas id="statGenderChartCtx"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card h-100">
+                            <div class="card-header">TOP 10 RATING ELO CLB</div>
+                            <div class="card-body" style="height: 300px;">
+                                <canvas id="statRatingDistChartCtx"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card h-100">
+                            <div class="card-header">TĂNG TRƯỞNG SỐ TRẬN THI ĐẤU</div>
+                            <div class="card-body" style="height: 300px;">
+                                <canvas id="statMatchTrendChartCtx"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 7. SETTINGS VIEW -->
+            <section id="settingsView" class="view-section" style="display: none;">
+                <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+                    <div>
+                        <h2 class="mb-1">⚙️ CÀI ĐẶT HỆ THỐNG</h2>
+                        <p class="text-muted">Cấu hình điểm Rating Elo (1v1 & 2v2), Điểm Mùa giải và Sao lưu / Khôi phục dữ liệu</p>
+                    </div>
+                </div>
+
+                <div class="row g-4">
+                    <div class="col-lg-8">
+                        <form id="settingsForm">
+                            <div class="card mb-4">
+                                <div class="card-header">⚙️ CẤU HÌNH RATING ELO</div>
+                                <div class="card-body">
+                                    <div class="row g-3">
+                                        <div class="col-md-6">
+                                            <label class="form-label">Rating ban đầu khởi tạo</label>
+                                            <input type="number" class="form-control" id="settingInitRatingInput" value="1000">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">Hệ số K-Factor (mặc định 32)</label>
+                                            <input type="number" class="form-control" id="settingKFactorInput" value="32">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="card mb-4">
+                                <div class="card-header">🏆 CẤU HÌNH ĐIỂM THƯỞNG MÙA GIẢI</div>
+                                <div class="card-body">
+                                    <div class="row g-3">
+                                        <div class="col-md-4">
+                                            <label class="form-label">🥇 Vô địch (+ điểm)</label>
+                                            <input type="number" class="form-control" id="settingPtsChampion" value="100">
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label">🥈 Á quân (+ điểm)</label>
+                                            <input type="number" class="form-control" id="settingPtsRunnerUp" value="70">
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label">🥉 Hạng 3 (+ điểm)</label>
+                                            <input type="number" class="form-control" id="settingPtsThird" value="50">
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label">Hạng 4 (+ điểm)</label>
+                                            <input type="number" class="form-control" id="settingPtsFourth" value="40">
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label">Tứ kết (+ điểm)</label>
+                                            <input type="number" class="form-control" id="settingPtsQuarter" value="30">
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label">Tham gia / Vòng bảng (+ điểm)</label>
+                                            <input type="number" class="form-control" id="settingPtsGroup" value="10">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">Thắng 1 trận (+ điểm Mùa)</label>
+                                            <input type="number" class="form-control" id="settingPtsMatchWin" value="5">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">Thua 1 trận (- điểm Mùa bị trừ)</label>
+                                            <input type="number" class="form-control" id="settingPtsMatchLoss" value="3">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="card mb-4">
+                                <div class="card-header">🔒 MÃ PIN ADMIN MANAGEMENT</div>
+                                <div class="card-body">
+                                    <div class="col-md-6">
+                                        <label class="form-label">Mã PIN Admin bảo mật</label>
+                                        <input type="password" class="form-control" id="settingAdminPin" value="1302">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-save"></i> LƯU CẤU HÌNH
+                            </button>
+                        </form>
+                    </div>
+
+                    <div class="col-lg-4">
+                        <div class="card mb-4">
+                            <div class="card-header">💾 IMPORT / EXPORT DỮ LIỆU</div>
+                            <div class="card-body d-flex flex-column gap-2">
+                                <button class="btn btn-outline-primary w-100" onclick="exportDataJSON()">
+                                    <i class="fas fa-file-export"></i> Export JSON Backup
+                                </button>
+                                <button class="btn btn-outline-success w-100" onclick="exportMembersCSV()">
+                                    <i class="fas fa-file-excel"></i> Export Danh Sách CSV/Excel
+                                </button>
+                                <button class="btn btn-outline-info w-100" onclick="openModal('importModal')">
+                                    <i class="fas fa-file-import"></i> Import Dữ Liệu Từ JSON
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="card border-danger">
+                            <div class="card-header bg-danger text-white">⚠️ DỮ LIỆU DEMO</div>
+                            <div class="card-body">
+                                <p class="small text-muted mb-3">Khôi phục lại dữ liệu 10 thành viên demo ban đầu nếu bạn muốn reset lại toàn bộ thử nghiệm.</p>
+                                <button class="btn btn-outline-danger w-100" onclick="handleResetAllData()">
+                                    <i class="fas fa-trash-restore"></i> Reset Về Dữ Liệu Demo Ban Đầu
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+</div>
+
+<!-- ==========================================================================
+     MODALS SECTION
+     ========================================================================== -->
+
+<!-- 1. MEMBER FORM MODAL -->
+<div class="modal-backdrop" id="memberModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 id="memberModalTitle">THÊM THÀNH VIÊN MỚI</h3>
+            <button class="toast-close" onclick="closeModal('memberModal')">&times;</button>
+        </div>
+        <form id="memberForm">
+            <input type="hidden" id="memberFormId">
+            <div class="modal-body">
+                <div class="row g-3">
+                    <div class="col-12">
+                        <label class="form-label">📷 Ảnh đại diện VĐV (Tải ảnh từ máy tính / điện thoại)</label>
+                        <input type="file" class="form-control" id="memberAvatarFileInput" accept="image/*" onchange="handleAvatarFileChange(event)">
+                        <div id="avatarPreviewContainer" class="mt-2 p-2 border rounded bg-dark">
+                            <!-- Preview Avatar Display -->
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label">Mã thành viên</label>
+                        <input type="text" class="form-control" id="memberCodeInput" required readonly style="background-color: rgba(255,255,255,0.05);">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Họ và tên *</label>
+                        <input type="text" class="form-control" id="memberNameInput" required placeholder="Nhập họ và tên..." oninput="updateAvatarPreviewDisplay()">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Tên hiển thị (Biệt danh)</label>
+                        <input type="text" class="form-control" id="memberDisplayNameInput" placeholder="Ví dụ: An Nguyễn">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Giới tính</label>
+                        <select class="form-select" id="memberGenderInput">
+                            <option value="male">Nam</option>
+                            <option value="female">Nữ</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Năm sinh</label>
+                        <input type="number" class="form-control" id="memberBirthYearInput" placeholder="1992">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Số điện thoại</label>
+                        <input type="text" class="form-control" id="memberPhoneInput" placeholder="0901234567">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Email</label>
+                        <input type="email" class="form-control" id="memberEmailInput" placeholder="email@example.com">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Ngày tham gia CLB</label>
+                        <input type="date" class="form-control" id="memberJoinDateInput">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Trình độ chơi</label>
+                        <select class="form-select" id="memberLevelInput">
+                            <option value="Mới chơi">Mới chơi</option>
+                            <option value="Trung bình" selected>Trung bình</option>
+                            <option value="Khá">Khá</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Tay thuận</label>
+                        <select class="form-select" id="memberDominantHandInput">
+                            <option value="right">Tay phải</option>
+                            <option value="left">Tay trái</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">⭐ Rating Elo ban đầu khởi tạo *</label>
+                        <input type="number" class="form-control" id="memberInitialRatingInput" value="1000" placeholder="Ví dụ: 1000 Elo">
+                        <small class="text-muted d-block mt-1">Điểm Elo khi VĐV đăng ký gia nhập CLB</small>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">⚡ Rating Elo hiện tại</label>
+                        <input type="number" class="form-control" id="memberRatingInput" value="1000" placeholder="Rating Elo hiện tại">
+                        <small class="text-muted d-block mt-1">Điểm Elo thực tế sau các trận đấu</small>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Trạng thái</label>
+                        <select class="form-select" id="memberStatusInput">
+                            <option value="active">Hoạt động</option>
+                            <option value="inactive">Tạm ngưng</option>
+                        </select>
+                    </div>
+                    <div class="col-md-12">
+                        <label class="form-label">Màu Avatar mặc định (Khi không tải ảnh)</label>
+                        <input type="color" class="form-control form-control-color w-100" id="avatarBgInput" value="#2563eb" onchange="updateAvatarPreviewDisplay()">
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label">Ghi chú kỹ thuật / phong cách</label>
+                        <textarea class="form-control" id="memberNotesInput" rows="2" placeholder="Ví dụ: Giao bóng xoáy khá căng, thích đánh đôi..."></textarea>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" onclick="closeModal('memberModal')">Hủy</button>
+                <button type="submit" class="btn btn-primary">LƯU THÀNH VIÊN</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- 2. MEMBER PROFILE DETAIL MODAL -->
+<div class="modal-backdrop" id="profileModal">
+    <div class="modal-content modal-lg">
+        <div class="modal-header">
+            <h3>HỒ SƠ THÀNH VIÊN VẬN ĐỘNG VIÊN</h3>
+            <button class="toast-close" onclick="closeModal('profileModal')">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div class="d-flex align-items-center gap-3 mb-4 p-3 rounded bg-dark">
+                <div id="profileAvatarContainer"></div>
+                <div class="flex-grow-1">
+                    <h2 class="mb-0" id="profileName">Tên VĐV</h2>
+                    <div class="text-muted small" id="profileCode">TV001</div>
+                    <div class="mt-1" id="profileLevel"></div>
+                </div>
+                <div class="text-end">
+                    <div class="text-muted small">RANKING</div>
+                    <div class="fs-3 fw-bold text-warning" id="profileRank">#1</div>
+                    <div class="fs-4 fw-bold text-success" id="profileRating">1250 <small>pts</small></div>
+                </div>
+            </div>
+
+            <!-- Stats Row -->
+            <div class="row g-3 mb-4 text-center">
+                <div class="col-3">
+                    <div class="p-2 border rounded bg-card">
+                        <div class="small text-muted">Số trận</div>
+                        <div class="fs-4 fw-bold" id="profileMatches">0</div>
+                    </div>
+                </div>
+                <div class="col-3">
+                    <div class="p-2 border rounded bg-card">
+                        <div class="small text-muted">Thắng</div>
+                        <div class="fs-4 fw-bold text-success" id="profileWins">0</div>
+                    </div>
+                </div>
+                <div class="col-3">
+                    <div class="p-2 border rounded bg-card">
+                        <div class="small text-muted">Thua</div>
+                        <div class="fs-4 fw-bold text-danger" id="profileLosses">0</div>
+                    </div>
+                </div>
+                <div class="col-3">
+                    <div class="p-2 border rounded bg-card">
+                        <div class="small text-muted">Win Rate</div>
+                        <div class="fs-4 fw-bold text-warning" id="profileWinRate">0%</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Medals Shelf -->
+            <div class="d-flex justify-content-around p-3 border rounded mb-4 bg-dark text-center">
+                <div>🥇 Vô địch: <strong class="fs-5 text-warning" id="profileGoldCount">0</strong></div>
+                <div>🥈 Á quân: <strong class="fs-5 text-secondary" id="profileSilverCount">0</strong></div>
+                <div>🥉 Hạng 3: <strong class="fs-5 text-gold" id="profileBronzeCount">0</strong></div>
+                <div>⭐ Điểm Mùa: <strong class="fs-5 text-primary" id="profileSeasonPoints">0</strong></div>
+            </div>
+
+            <!-- Rating History Chart -->
+            <div class="card mb-4">
+                <div class="card-header">📈 DIỄN BIẾN RATING ELO (1V1 & 2V2)</div>
+                <div class="card-body" style="height: 220px;">
+                    <canvas id="memberRatingChartCtx"></canvas>
+                </div>
+            </div>
+
+            <!-- Match History Table for this member -->
+            <div class="card">
+                <div class="card-header">LỊCH SỬ THI ĐẤU CÁ NHÂN</div>
+                <div class="card-body p-0 table-responsive" style="max-height: 250px; overflow-y: auto;">
+                    <table class="table table-hover mb-0">
+                        <thead>
+                            <tr>
+                                <th>Giải đấu</th>
+                                <th>Thời gian</th>
+                                <th>Đối thủ</th>
+                                <th>Kết quả</th>
+                                <th>Rating trước</th>
+                                <th>Rating sau</th>
+                            </tr>
+                        </thead>
+                        <tbody id="profileMatchHistoryBody">
+                            <!-- Dynamic Content -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Personal Info Details -->
+            <div class="mt-4 row small text-muted g-2">
+                <div class="col-6">Giới tính: <strong class="text-white" id="profileGender">Nam</strong></div>
+                <div class="col-6">Năm sinh: <strong class="text-white" id="profileBirthYear">1992</strong></div>
+                <div class="col-6">Tay thuận: <strong class="text-white" id="profileHand">Tay phải</strong></div>
+                <div class="col-6">Số ĐT: <strong class="text-white" id="profilePhone">0901234567</strong></div>
+                <div class="col-6">Email: <strong class="text-white" id="profileEmail">---</strong></div>
+                <div class="col-12">Ghi chú: <span class="text-white" id="profileNotes">Không có</span></div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" onclick="closeModal('profileModal')">Đóng</button>
+        </div>
+    </div>
+</div>
+
+<!-- 3. MATCH SCORE ENTRY MODAL (CHỌN CẶP ĐẤU KNOCKOUT & NHẬP ĐIỂM) -->
+<div class="modal-backdrop" id="matchScoreModal">
+    <div class="modal-content modal-lg">
+        <div class="modal-header">
+            <h3>CHỌN CẶP ĐẤU KNOCKOUT & NHẬP KẾT QUẢ</h3>
+            <button class="toast-close" onclick="closeModal('matchScoreModal')">&times;</button>
+        </div>
+        <form id="matchScoreForm">
+            <input type="hidden" id="matchScoreId">
+            <input type="hidden" id="matchTournamentId">
+            <div class="modal-body">
+                <div class="text-center text-muted mb-3" id="matchModalRoundTitle">Vòng đấu • Sân 1</div>
+                
+                <!-- 1 VS 1 SINGLES CONTAINER -->
+                <div class="row align-items-center g-3 text-center my-3" id="matchScoreSinglesContainer">
+                    <div class="col-5">
+                        <div class="p-3 border rounded bg-dark text-start">
+                            <label class="form-label text-primary fw-bold"><i class="fas fa-user"></i> VĐV / ĐỘI 1</label>
+                            <select class="form-select mb-2" id="singlesP1Select" onchange="updateMatchPlayerRatingDisplay('singles', 1)"></select>
+                            <small class="text-muted" id="scoreP1Rating">Rating: 1000</small>
+                        </div>
+                    </div>
+
+                    <div class="col-2 fs-3 font-bold text-muted text-center">VS</div>
+
+                    <div class="col-5">
+                        <div class="p-3 border rounded bg-dark text-start">
+                            <label class="form-label text-warning fw-bold"><i class="fas fa-user"></i> VĐV / ĐỘI 2</label>
+                            <select class="form-select mb-2" id="singlesP2Select" onchange="updateMatchPlayerRatingDisplay('singles', 2)"></select>
+                            <small class="text-muted" id="scoreP2Rating">Rating: 1000</small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2 VS 2 DOUBLES CONTAINER -->
+                <div class="row align-items-center g-3 text-center my-3" id="matchScoreDoublesContainer" style="display: none;">
+                    <div class="col-5">
+                        <div class="p-3 border rounded bg-dark text-start">
+                            <h5 class="mb-2 text-primary"><i class="fas fa-users"></i> ĐỘI 1 (PAIR A)</h5>
+                            <label class="form-label small text-muted">Gợi ý chọn Cặp đấu đôi đã tạo:</label>
+                            <select class="form-select form-select-sm mb-2" id="doublesTeam1Select" onchange="handleDoublesTeamSelectChange(1)"></select>
+                            <hr class="my-2 border-secondary">
+                            <label class="form-label small">VĐV 1A</label>
+                            <select class="form-select mb-2" id="doublesP1ASelect"></select>
+                            <label class="form-label small">VĐV 1B</label>
+                            <select class="form-select" id="doublesP1BSelect"></select>
+                        </div>
+                    </div>
+
+                    <div class="col-2 fs-3 font-bold text-muted text-center">VS</div>
+
+                    <div class="col-5">
+                        <div class="p-3 border rounded bg-dark text-start">
+                            <h5 class="mb-2 text-warning"><i class="fas fa-users"></i> ĐỘI 2 (PAIR B)</h5>
+                            <label class="form-label small text-muted">Gợi ý chọn Cặp đấu đôi đã tạo:</label>
+                            <select class="form-select form-select-sm mb-2" id="doublesTeam2Select" onchange="handleDoublesTeamSelectChange(2)"></select>
+                            <hr class="my-2 border-secondary">
+                            <label class="form-label small">VĐV 2A</label>
+                            <select class="form-select mb-2" id="doublesP2ASelect"></select>
+                            <label class="form-label small">VĐV 2B</label>
+                            <select class="form-select" id="doublesP2BSelect"></select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Score Inputs Row -->
+                <div class="row align-items-center g-3 text-center my-3 justify-content-center">
+                    <div class="col-4">
+                        <label class="form-label">Điểm Đội 1 / VĐV 1</label>
+                        <input type="number" class="form-control text-center fs-2 font-bold" id="scoreP1Input" min="0" max="99" required value="15">
+                    </div>
+                    <div class="col-1 fs-3 font-bold text-muted mt-4">-</div>
+                    <div class="col-4">
+                        <label class="form-label">Điểm Đội 2 / VĐV 2</label>
+                        <input type="number" class="form-control text-center fs-2 font-bold" id="scoreP2Input" min="0" max="99" required value="12">
+                    </div>
+                </div>
+
+                <div class="alert alert-info small mt-3">
+                    💡 <strong>Ban Tổ Chức Lưu Ý</strong>: Các trận Knockout (Tứ kết, Bán kết, Chung kết) cho phép chọn bất kỳ cặp đấu/VĐV nào thắng từ vòng trước để thi đấu và tự động tính điểm Elo!
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" onclick="closeModal('matchScoreModal')">Hủy</button>
+                <button type="submit" class="btn btn-success"><i class="fas fa-check"></i> LƯU KẾT QUẢ & CẬP NHẬT ELO</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- 4. TOURNAMENT FORM MODAL -->
+<div class="modal-backdrop" id="tournamentModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 id="tournamentModalTitle">TẠO GIẢI ĐẤU MỚI</h3>
+            <button class="toast-close" onclick="closeModal('tournamentModal')">&times;</button>
+        </div>
+        <form id="tournamentForm">
+            <input type="hidden" id="tournamentIdInput">
+            <div class="modal-body">
+                <div class="row g-3">
+                    <div class="col-12">
+                        <label class="form-label">Tên giải đấu *</label>
+                        <input type="text" class="form-control" id="tournamentNameInput" required placeholder="Ví dụ: FRIENDS PICKLEBALL OPEN 2026">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Ngày tổ chức</label>
+                        <input type="date" class="form-control" id="tournamentDateInput" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Số sân sử dụng</label>
+                        <input type="number" class="form-control" id="tournamentCourtsInput" value="2" min="1" max="10">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Địa điểm</label>
+                        <input type="text" class="form-control" id="tournamentLocationInput" value="Sân Pickleball Friends Club">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Người tổ chức</label>
+                        <input type="text" class="form-control" id="tournamentOrganizerInput" value="Ban Quản Trị CLB">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Thể thức thi đấu</label>
+                        <select class="form-select" id="tournamentFormatInput">
+                            <option value="Vòng tròn">Vòng tròn (Round Robin)</option>
+                            <option value="Vòng bảng + Knockout" selected>Vòng bảng + Knockout</option>
+                            <option value="Loại trực tiếp">Loại trực tiếp (Knockout)</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Hình thức đấu</label>
+                        <select class="form-select" id="tournamentTypeInput">
+                            <option value="singles">Đấu đơn (1 vs 1)</option>
+                            <option value="doubles" selected>Đấu đôi (2 vs 2)</option>
+                        </select>
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label">Ghi chú giải đấu</label>
+                        <textarea class="form-control" id="tournamentNotesInput" rows="2" placeholder="Ghi chú giải đấu..."></textarea>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" onclick="closeModal('tournamentModal')">Hủy</button>
+                <button type="submit" class="btn btn-primary">TẠO GIẢI ĐẤU</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- 5A. PLAYER SELECTOR MODAL -->
+<div class="modal-backdrop" id="playerSelectModal">
+    <div class="modal-content modal-lg">
+        <div class="modal-header">
+            <h3>CHỌN VẬN ĐỘNG VIÊN THAM GIA GIẢI</h3>
+            <button class="toast-close" onclick="closeModal('playerSelectModal')">&times;</button>
+        </div>
+        <div class="modal-body">
+            <input type="hidden" id="selectPlayerTourId">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h4 class="mb-0 text-primary" id="selectPlayerTourName">Tên Giải</h4>
+                <div class="btn-group-sm">
+                    <button class="btn btn-outline-primary btn-sm" onclick="selectAllPlayers(true)">CHỌN TẤT CẢ</button>
+                    <button class="btn btn-outline-secondary btn-sm" onclick="selectAllPlayers(false)">BỎ CHỌN TẤT CẢ</button>
+                </div>
+            </div>
+
+            <div class="alert alert-info small mb-3">
+                💡 Chọn danh sách các VĐV tham gia giải đấu. Nếu là giải Đấu Đôi (2v2), ở bước tiếp theo Ban Tổ Chức sẽ tự chia các cặp đấu đôi!
+            </div>
+
+            <div id="playerSelectList" style="max-height: 400px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px;">
+                <!-- Dynamic Player List Checkboxes -->
+            </div>
+        </div>
+        <div class="modal-footer d-flex justify-content-between">
+            <div class="fw-bold text-success" id="selectedPlayerCountText">Đã chọn: 0 VĐV</div>
+            <div>
+                <button type="button" class="btn btn-outline-secondary" onclick="closeModal('playerSelectModal')">Hủy</button>
+                <button type="button" class="btn btn-primary" onclick="saveTournamentPlayers()">TIẾP TỤC: XẾP LỊCH & CHIA ĐỘI</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 5B. DOUBLES PAIRING MODAL (BAN TỔ CHỨC TỰ CHIA ĐỘI 2V2) -->
+<div class="modal-backdrop" id="doublesPairingModal">
+    <div class="modal-content modal-lg">
+        <div class="modal-header">
+            <h3>👥 BAN TỔ CHỨC CHIA CẶP ĐẤU ĐÔI (2 VS 2)</h3>
+            <button class="toast-close" onclick="closeModal('doublesPairingModal')">&times;</button>
+        </div>
+        <div class="modal-body">
+            <input type="hidden" id="pairingTourId">
+            <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+                <div>
+                    <h4 class="mb-1 text-warning" id="pairingTourName">Tên Giải Đấu Đôi</h4>
+                    <span class="text-muted small">Ban Tổ Chức tự ghép cặp hoặc sử dụng tự động chia cặp cân bằng Elo</span>
+                </div>
+                <div class="btn-group-sm">
+                    <button class="btn btn-outline-warning btn-sm" onclick="autoBalanceDoublesPairs()">
+                        <i class="fas fa-magic"></i> Tự động chia cặp Elo cân bằng
+                    </button>
+                    <button class="btn btn-primary btn-sm" onclick="addDoublesTeamRow()">
+                        <i class="fas fa-plus"></i> + Thêm Cặp Đấu Mới
+                    </button>
+                </div>
+            </div>
+
+            <div class="alert alert-info small mb-3">
+                💡 <strong>Hướng dẫn Chia Đội Ban Tổ Chức</strong>: Chọn VĐV 1 & VĐV 2 cho từng Cặp đấu. Sau khi chọn xong tất cả các Cặp đấu, hệ thống sẽ tự động chuyển sang bước **CHIA BẢNG BẰNG TAY**!
+            </div>
+
+            <!-- List of Pairs Created by BTC -->
+            <div class="card mb-3">
+                <div class="card-header">👨‍👨‍👦 DANH SÁCH CÁC CẶP ĐẤU ĐÔI BAN TỔ CHỨC ĐÃ CHIA</div>
+                <div class="card-body p-3" id="doublesPairingRowsContainer">
+                    <!-- Dynamic pair rows -->
+                </div>
+            </div>
+
+            <!-- Unpaired Players Remaining -->
+            <div class="card">
+                <div class="card-header bg-dark">📋 VẬN ĐỘNG VIÊN CHƯA CÓ CẶP (<span id="unpairedPlayerCount">0</span>)</div>
+                <div class="card-body p-3 d-flex flex-wrap gap-2" id="unpairedPlayerChips">
+                    <!-- Dynamic player chips -->
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-outline-secondary" onclick="closeModal('doublesPairingModal')">Hủy</button>
+            <button type="button" class="btn btn-primary fw-bold" onclick="proceedToManualGroupAssignment()">
+                <i class="fas fa-arrow-right"></i> TIẾP TỤC: CHIA BẢNG BẰNG TAY
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- 5C. MANUAL GROUP ASSIGNMENT MODAL (BAN TỔ CHỨC PHÂN BẢNG A, B, C, D...) -->
+<div class="modal-backdrop" id="manualGroupAssignmentModal">
+    <div class="modal-content modal-lg">
+        <div class="modal-header">
+            <h3>🔀 BAN TỔ CHỨC CHIA BẢNG ĐẤU BẰNG TAY</h3>
+            <button class="toast-close" onclick="closeModal('manualGroupAssignmentModal')">&times;</button>
+        </div>
+        <div class="modal-body">
+            <input type="hidden" id="groupAssignTourId">
+            <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+                <div>
+                    <h4 class="mb-1 text-primary" id="groupAssignTourName">Tên Giải Đấu</h4>
+                    <span class="text-muted small">Phân chia VĐV / Cặp đấu đôi vào từng Bảng A, Bảng B, Bảng C... theo ý Ban Tổ Chức</span>
+                </div>
+                <div class="d-flex align-items-center gap-2">
+                    <label class="form-label mb-0 small text-nowrap">Số lượng bảng:</label>
+                    <select class="form-select form-select-sm" id="numGroupsSelect" style="width: 100px;" onchange="changeNumGroupsSetting()">
+                        <option value="2" selected>2 Bảng (A, B)</option>
+                        <option value="3">3 Bảng (A, B, C)</option>
+                        <option value="4">4 Bảng (A, B, C, D)</option>
+                    </select>
+                    <button class="btn btn-outline-warning btn-sm" onclick="autoAssignGroupsByElo()">
+                        <i class="fas fa-magic"></i> Chia bảng Elo tự động
+                    </button>
+                </div>
+            </div>
+
+            <div class="alert alert-info small mb-3">
+                💡 <strong>Hướng dẫn Chia Bảng Bằng Tay</strong>: Chọn tên Bảng đấu (Bảng A, Bảng B, Bảng C...) tương ứng cho từng VĐV / Cặp đấu đôi. Sau đó bấm **"LƯU BẢNG & TẠO LỊCH THI ĐẤU"**.
+            </div>
+
+            <!-- Group Assign List Container -->
+            <div class="card">
+                <div class="card-header bg-dark">📋 DANH SÁCH THÍ SINH / CẶP ĐẤU ĐÃ CHỌN BẢNG</div>
+                <div class="card-body p-3" id="groupAssignmentRowsContainer">
+                    <!-- Dynamic group assignment rows -->
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-outline-secondary" onclick="closeModal('manualGroupAssignmentModal')">Hủy</button>
+            <button type="button" class="btn btn-success fw-bold" onclick="saveManualGroupAssignmentAndSchedule()">
+                <i class="fas fa-check-circle"></i> LƯU BẢNG & TẠO LỊCH THI ĐẤU
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- 5D. FRIENDLY MATCH MODAL (THÊM TRẬN GIAO HỮU TÍNH ELO) -->
+<div class="modal-backdrop" id="friendlyMatchModal">
+    <div class="modal-content modal-lg">
+        <div class="modal-header">
+            <h3>🤝 THÊM TRẬN ĐẤU GIAO HỮU (TÍNH ĐIỂM ELO)</h3>
+            <button class="toast-close" onclick="closeModal('friendlyMatchModal')">&times;</button>
+        </div>
+        <form id="friendlyMatchForm">
+            <div class="modal-body">
+                <div class="row g-3 mb-3">
+                    <div class="col-md-6">
+                        <label class="form-label">Hình thức thi đấu *</label>
+                        <select class="form-select" id="friendlyMatchTypeSelect" onchange="toggleFriendlyMatchTypeUI()">
+                            <option value="singles" selected>Đấu đơn (1 vs 1)</option>
+                            <option value="doubles">Đấu đôi (2 vs 2)</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Sân thi đấu / Ghi chú</label>
+                        <input type="text" class="form-control" id="friendlyCourtInput" value="Sân Giao hữu Friends Club">
+                    </div>
+                </div>
+
+                <!-- 1v1 SINGLES SELECTOR -->
+                <div id="friendlySinglesContainer" class="row g-3 align-items-center text-center my-2 p-3 border rounded bg-dark">
+                    <div class="col-md-5 text-start">
+                        <label class="form-label text-primary fw-bold"><i class="fas fa-user"></i> VẬN ĐỘNG VIÊN 1 *</label>
+                        <select class="form-select" id="friendlyP1Select" onchange="updateFriendlyRatingPreview()"></select>
+                        <small class="text-muted d-block mt-1" id="friendlyP1Elo">Rating: 1000 Elo</small>
+                    </div>
+                    <div class="col-md-2 fs-3 font-bold text-warning text-center">VS</div>
+                    <div class="col-md-5 text-start">
+                        <label class="form-label text-warning fw-bold"><i class="fas fa-user"></i> VẬN ĐỘNG VIÊN 2 *</label>
+                        <select class="form-select" id="friendlyP2Select" onchange="updateFriendlyRatingPreview()"></select>
+                        <small class="text-muted d-block mt-1" id="friendlyP2Elo">Rating: 1000 Elo</small>
+                    </div>
+                </div>
+
+                <!-- 2v2 DOUBLES SELECTOR -->
+                <div id="friendlyDoublesContainer" class="row g-3 text-center my-2 p-3 border rounded bg-dark" style="display: none;">
+                    <div class="col-md-5 text-start">
+                        <h5 class="text-primary mb-2"><i class="fas fa-users"></i> ĐỘI 1 (CẶP A)</h5>
+                        <label class="form-label small">VĐV 1A *</label>
+                        <select class="form-select mb-2" id="friendlyP1ASelect"></select>
+                        <label class="form-label small">VĐV 1B *</label>
+                        <select class="form-select" id="friendlyP1BSelect"></select>
+                    </div>
+                    <div class="col-md-2 fs-3 font-bold text-warning text-center my-auto">VS</div>
+                    <div class="col-md-5 text-start">
+                        <h5 class="text-warning mb-2"><i class="fas fa-users"></i> ĐỘI 2 (CẶP B)</h5>
+                        <label class="form-label small">VĐV 2A *</label>
+                        <select class="form-select mb-2" id="friendlyP2ASelect"></select>
+                        <label class="form-label small">VĐV 2B *</label>
+                        <select class="form-select" id="friendlyP2BSelect"></select>
+                    </div>
+                </div>
+
+                <!-- SCORES INPUT -->
+                <div class="row align-items-center g-3 text-center my-3 justify-content-center">
+                    <div class="col-5 col-md-4">
+                        <label class="form-label">Điểm Đội 1 / VĐV 1</label>
+                        <input type="number" class="form-control text-center fs-2 font-bold" id="friendlyScore1Input" min="0" max="99" required value="15">
+                    </div>
+                    <div class="col-2 col-md-1 fs-3 font-bold text-muted mt-4">-</div>
+                    <div class="col-5 col-md-4">
+                        <label class="form-label">Điểm Đội 2 / VĐV 2</label>
+                        <input type="number" class="form-control text-center fs-2 font-bold" id="friendlyScore2Input" min="0" max="99" required value="11">
+                    </div>
+                </div>
+
+                <div class="alert alert-info small mb-0">
+                    ⚡ <strong>Tính điểm Rating Elo Giao hữu</strong>: Trận giao hữu sẽ được lưu vào Lịch sử thi đấu và tự động tính toán cộng/trừ điểm Elo chính xác cho các VĐV!
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" onclick="closeModal('friendlyMatchModal')">Hủy</button>
+                <button type="submit" class="btn btn-success fw-bold"><i class="fas fa-check-circle"></i> GHI NHẬN TRẬN GIAO HỮU & CẬP NHẬT ELO</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- 6. IMPORT JSON BACKUP MODAL -->
+<div class="modal-backdrop" id="importModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>IMPORT DỮ LIỆU TỪ FILE JSON</h3>
+            <button class="toast-close" onclick="closeModal('importModal')">&times;</button>
+        </div>
+        <div class="modal-body">
+            <p class="text-muted small mb-3">Chọn file `.json` đã xuất trước đó để khôi phục toàn bộ danh sách thành viên, kết quả giải đấu và lịch sử thi đấu.</p>
+            <input type="file" id="importFileInput" accept=".json" class="form-control" onchange="handleImportFileSelect(event)">
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" onclick="closeModal('importModal')">Đóng</button>
+        </div>
+    </div>
+</div>
+
+<!-- 7. CONFIRM DIALOG MODAL -->
+<div class="modal-backdrop" id="confirmModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 id="confirmTitle">XÁC NHẬN THAO TÁC</h3>
+            <button class="toast-close" onclick="closeModal('confirmModal')">&times;</button>
+        </div>
+        <div class="modal-body">
+            <p id="confirmMessage">Bạn có chắc chắn muốn thực hiện thao tác này?</p>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-outline-secondary" onclick="closeModal('confirmModal')">Hủy</button>
+            <button type="button" class="btn btn-danger" id="confirmBtn">Đồng ý</button>
+        </div>
+    </div>
+</div>
+
+<!-- 8. TV BROADCAST OVERLAY -->
+<div class="tv-mode-overlay" id="tvModeOverlay">
+    <div class="tv-header">
+        <div class="d-flex align-items-center gap-3">
+            <img src="assets/logo.jpg" alt="Logo" style="width: 60px; height: 60px; border-radius: 50%; border: 2px solid var(--accent-gold);">
+            <div>
+                <h1 class="mb-0 text-white">FRIENDS PICKLEBALL CLUB</h1>
+                <div class="text-success fw-bold">OFFICIAL CLUB LEADERBOARD • TV BROADCAST</div>
+            </div>
+        </div>
+        <button class="btn btn-outline-light btn-lg" onclick="toggleTVMode()">
+            <i class="fas fa-times"></i> Thoát TV Mode
+        </button>
+    </div>
+
+    <div id="tvStandingsList">
+        <!-- Dynamic TV Standings -->
+    </div>
+</div>
+
+<!-- Application JavaScript Modules -->
+<script src="js/storage.js"></script>
+<script src="js/utils.js"></script>
+<script src="js/members.js"></script>
+<script src="js/matches.js"></script>
+<script src="js/tournaments.js"></script>
+<script src="js/ranking.js"></script>
+<script src="js/statistics.js"></script>
+<script src="js/app.js"></script>
+
+</body>
+</html>
