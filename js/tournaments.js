@@ -107,14 +107,15 @@ function openAddTournamentModal() {
 }
 
 function saveTournamentForm(e) {
-    e.preventDefault();
+    if (e) e.preventDefault();
+    if (typeof checkAdminPermission === 'function' && !checkAdminPermission()) return false;
 
-    const id = document.getElementById('tournamentIdInput').value;
-    const name = document.getElementById('tournamentNameInput').value.trim();
+    const id = document.getElementById('tournamentIdInput')?.value || '';
+    const name = document.getElementById('tournamentNameInput')?.value.trim() || '';
 
     if (!name) {
         showToast('Vui lòng nhập tên giải đấu!', 'warning');
-        return;
+        return false;
     }
 
     pushUndoSnapshot(id ? `Sửa giải đấu ${name}` : `Tạo giải đấu mới ${name}`);

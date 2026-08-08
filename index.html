@@ -751,7 +751,7 @@
             <h3 id="memberModalTitle">THÊM THÀNH VIÊN MỚI</h3>
             <button class="toast-close" onclick="closeModal('memberModal')">&times;</button>
         </div>
-        <form id="memberForm">
+        <form id="memberForm" onsubmit="saveMemberForm(event); return false;">
             <input type="hidden" id="memberFormId">
             <div class="modal-body">
                 <div class="row g-3">
@@ -959,7 +959,7 @@
             <h3>CHỌN CẶP ĐẤU KNOCKOUT & NHẬP KẾT QUẢ</h3>
             <button class="toast-close" onclick="closeModal('matchScoreModal')">&times;</button>
         </div>
-        <form id="matchScoreForm">
+        <form id="matchScoreForm" onsubmit="saveMatchScoreForm(event); return false;">
             <input type="hidden" id="matchScoreId">
             <input type="hidden" id="matchTournamentId">
             <div class="modal-body">
@@ -1057,7 +1057,7 @@
             <h3 id="tournamentModalTitle">TẠO GIẢI ĐẤU MỚI</h3>
             <button class="toast-close" onclick="closeModal('tournamentModal')">&times;</button>
         </div>
-        <form id="tournamentForm">
+        <form id="tournamentForm" onsubmit="saveTournamentForm(event); return false;">
             <input type="hidden" id="tournamentIdInput">
             <div class="modal-body">
                 <div class="row g-3">

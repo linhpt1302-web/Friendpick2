@@ -354,7 +354,8 @@ function openEditMemberModal(id) {
 }
 
 function saveMemberForm(e) {
-    e.preventDefault();
+    if (e) e.preventDefault();
+    if (typeof checkAdminPermission === 'function' && !checkAdminPermission()) return false;
 
     const id = document.getElementById('memberFormId').value;
     const isEdit = !!id;
@@ -362,7 +363,7 @@ function saveMemberForm(e) {
     const name = document.getElementById('memberNameInput').value.trim();
     if (!name) {
         showToast('Vui lòng nhập họ và tên thành viên!', 'warning');
-        return;
+        return false;
     }
 
     pushUndoSnapshot(isEdit ? `Sửa thành viên ${name}` : `Thêm thành viên mới ${name}`);

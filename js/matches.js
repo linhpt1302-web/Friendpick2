@@ -213,7 +213,8 @@ function populateDoublesMemberSelects(match) {
 }
 
 function saveMatchScoreForm(e) {
-    e.preventDefault();
+    if (e) e.preventDefault();
+    if (typeof checkAdminPermission === 'function' && !checkAdminPermission()) return false;
 
     const matchId = document.getElementById('matchScoreId').value;
     const score1 = parseInt(document.getElementById('scoreP1Input').value, 10);
