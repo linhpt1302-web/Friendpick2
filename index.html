@@ -73,92 +73,77 @@
 <div class="sidebar-backdrop" id="sidebarBackdrop" onclick="toggleMobileSidebar()"></div>
 
 <div class="app-container">
-    <!-- Sidebar Navigation -->
-    <aside class="sidebar" id="sidebar">
-        <div class="brand-header">
-            <img src="assets/logo.jpg" alt="Friends Pickleball Logo" class="brand-logo-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
-            <div style="display: none; font-size: 2rem;">🏓</div>
+    <!-- Single Horizontal Top Navbar -->
+    <header class="top-navbar">
+        <div class="top-navbar-brand">
+            <img src="assets/logo.jpg" alt="Logo" class="top-navbar-logo" onerror="this.style.display='none';">
             <div>
-                <div class="brand-title">FRIENDS</div>
-                <div class="brand-subtitle">PICKLEBALL CLUB</div>
+                <div class="top-navbar-title">FRIENDS <span>PICKLEBALL CLUB</span></div>
+                <div class="top-navbar-sub">QUẢN LÝ CLB & BẢNG XẾP HẠNG ELO</div>
             </div>
         </div>
 
-        <ul class="nav-menu">
-            <li class="nav-item">
-                <a href="#" class="nav-link active" data-tab="dashboardView">
-                    <i class="fas fa-home"></i> <span>Trang chủ</span>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="#" class="nav-link" data-tab="membersView">
-                    <i class="fas fa-users"></i> <span>Thành viên</span>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="#" class="nav-link" data-tab="rankingsView">
-                    <i class="fas fa-trophy"></i> <span>Bảng xếp hạng</span>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="#" class="nav-link" data-tab="tournamentsView">
-                    <i class="fas fa-bullseye"></i> <span>Giải đấu</span>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="#" class="nav-link" data-tab="matchHistoryView">
-                    <i class="fas fa-history"></i> <span>Lịch sử thi đấu</span>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="#" class="nav-link" data-tab="statisticsView">
-                    <i class="fas fa-chart-line"></i> <span>Thống kê</span>
-                </a>
-            </li>
-            <li class="nav-item admin-only">
-                <a href="#" class="nav-link" data-tab="settingsView">
-                    <i class="fas fa-cog"></i> <span>Cài đặt</span>
-                </a>
-            </li>
-        </ul>
+        <nav class="top-navbar-nav">
+            <ul class="top-nav-menu">
+                <li class="nav-item">
+                    <a href="#" class="nav-link active" data-tab="dashboardView" onclick="switchTab('dashboardView'); return false;">
+                        <i class="fas fa-home"></i> <span>Trang chủ</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link" data-tab="membersView" onclick="switchTab('membersView'); return false;">
+                        <i class="fas fa-users"></i> <span>Thành viên</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link" data-tab="rankingsView" onclick="switchTab('rankingsView'); return false;">
+                        <i class="fas fa-trophy"></i> <span>Bảng xếp hạng</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link" data-tab="tournamentsView" onclick="switchTab('tournamentsView'); return false;">
+                        <i class="fas fa-bullseye"></i> <span>Giải đấu</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link" data-tab="matchHistoryView" onclick="switchTab('matchHistoryView'); return false;">
+                        <i class="fas fa-history"></i> <span>Lịch sử thi đấu</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link" data-tab="statisticsView" onclick="switchTab('statisticsView'); return false;">
+                        <i class="fas fa-chart-line"></i> <span>Thống kê</span>
+                    </a>
+                </li>
+                <li class="nav-item admin-only">
+                    <a href="#" class="nav-link" data-tab="settingsView" onclick="switchTab('settingsView'); return false;">
+                        <i class="fas fa-cog"></i> <span>Cài đặt</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
 
-        <div class="sidebar-footer text-center">
-            <button class="btn btn-gold btn-sm w-100 mb-2" onclick="toggleTVMode()">
-                <i class="fas fa-tv"></i> Màn hình TV Standings
+        <div class="top-navbar-actions">
+            <button class="btn btn-gold btn-sm" onclick="toggleTVMode()" title="Chế độ TV Broadcast">
+                <i class="fas fa-tv"></i> <span class="d-none d-lg-inline">TV Mode</span>
             </button>
-            <div class="text-muted small">FRIENDS PICKLEBALL v2.2</div>
+            <div id="userRoleBadgeContainer" class="d-flex align-items-center gap-2">
+                <!-- Dynamic Role Badge -->
+            </div>
+            <button class="btn btn-outline-warning btn-sm admin-only" id="globalUndoBtn" onclick="triggerGlobalUndo()" title="Hoàn tác thao tác vừa thực hiện">
+                <i class="fas fa-undo"></i> <span class="d-none d-xl-inline">Hoàn tác</span>
+            </button>
+            <button class="btn btn-outline-primary btn-sm admin-only" onclick="exportDataJSON()" title="Xuất dữ liệu hệ thống">
+                <i class="fas fa-download"></i> <span class="d-none d-xl-inline">Export</span>
+            </button>
+            <button class="btn btn-primary btn-sm admin-only" onclick="openAddMemberModal()">
+                <i class="fas fa-plus"></i> <span class="d-none d-md-inline">+ Thêm VĐV</span>
+            </button>
         </div>
-    </aside>
+    </header>
 
     <!-- Main Wrapper -->
     <div class="main-wrapper">
-        <!-- Top Bar -->
-        <header class="top-bar">
-            <div class="d-flex align-items-center gap-3">
-                <button class="mobile-toggle-btn" onclick="toggleMobileSidebar()" aria-label="Toggle menu">
-                    <i class="fas fa-bars"></i>
-                </button>
-                <div class="d-flex align-items-center gap-2 d-md-none">
-                    <img src="assets/logo.jpg" alt="Logo" style="width:32px; height:32px; border-radius:50%;">
-                    <div class="brand-title">FRIENDS CLUB</div>
-                </div>
-                <div id="userRoleBadgeContainer" class="d-flex align-items-center gap-2">
-                    <!-- Dynamic Role Badge -->
-                </div>
-            </div>
-
-            <div class="action-buttons">
-                <button class="btn btn-outline-warning btn-sm admin-only" id="globalUndoBtn" onclick="triggerGlobalUndo()" title="Hoàn tác thao tác vừa thực hiện">
-                    <i class="fas fa-undo"></i> <span class="d-none d-sm-inline">Hoàn tác</span>
-                </button>
-                <button class="btn btn-outline-primary btn-sm admin-only" onclick="exportDataJSON()" title="Xuất dữ liệu hệ thống">
-                    <i class="fas fa-download"></i> <span class="d-none d-sm-inline">Export Data</span>
-                </button>
-                <button class="btn btn-primary btn-sm admin-only" onclick="openAddMemberModal()">
-                    <i class="fas fa-plus"></i> <span>+ Thêm VĐV</span>
-                </button>
-            </div>
-        </header>
 
         <!-- Content Body -->
         <main class="content-body">
