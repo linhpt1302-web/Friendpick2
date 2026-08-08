@@ -325,8 +325,8 @@ function updateDashboard() {
                 ${recentTour.status === 'completed' && winner ? `
                     <div class="p-2 rounded small bg-dark text-warning border border-warning">🏆 Vô địch: <strong>${winner.name}</strong></div>
                 ` : ''}
-                <button class="btn btn-primary btn-sm mt-3 w-100 fw-bold" onclick="switchTab('rankingsView')">
-                    XEM LỊCH & BẢNG XẾP HẠNG <i class="fas fa-arrow-right"></i>
+                <button class="btn btn-primary btn-sm mt-3 w-100 fw-bold" onclick="switchTab('tournamentsView')">
+                    XEM LỊCH & GIẢI ĐẤU <i class="fas fa-arrow-right"></i>
                 </button>
             </div>
         `;
