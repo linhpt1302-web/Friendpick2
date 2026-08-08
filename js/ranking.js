@@ -190,6 +190,8 @@ function renderRankingsTable() {
     }
 
     let html = '';
+    let mobileHtml = '';
+
     filtered.forEach((m, idx) => {
         let rankBadge = `${idx + 1}`;
         let rowClass = '';
@@ -218,14 +220,41 @@ function renderRankingsTable() {
                 <td>${eloDeltaBadge}</td>
                 <td>${m.tournaments || 0}</td>
                 <td>${m.matches || 0}</td>
-                <td class="text-success">${m.wins || 0}</td>
-                <td class="text-danger">${m.losses || 0}</td>
-                <td><strong>${winRate}</strong></td>
+                <td><span class="text-success">${m.wins || 0}</span></td>
+                <td><span class="text-danger">${m.losses || 0}</span></td>
+                <td><strong>${winRate}%</strong></td>
             </tr>
+        `;
+
+        mobileHtml += `
+            <div class="ranking-card-mobile card mb-2 ${rowClass}" onclick="viewMemberProfile('${m.id}')" style="cursor: pointer;">
+                <div class="card-body p-2 px-3 d-flex align-items-center justify-content-between">
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="ranking-rank-num font-bold text-center" style="width: 32px; font-size: 1.1rem;">${rankBadge}</div>
+                        ${renderMemberAvatarHTML(m, 'member-avatar-md')}
+                        <div>
+                            <div class="fw-bold text-white fs-6 mb-1">${m.name}</div>
+                            <div class="d-flex align-items-center gap-1">
+                                ${getLevelBadgeHTML(m.level)}
+                                <span class="text-muted extra-small ms-1">${winRate}% WR</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="text-end">
+                        <div class="text-primary font-bold fs-5">${m.rating} <small class="extra-small text-muted">Elo</small></div>
+                        <div class="mt-1">${eloDeltaBadge}</div>
+                    </div>
+                </div>
+            </div>
         `;
     });
 
     tableBody.innerHTML = html;
+
+    const mobileContainer = document.getElementById('mobileRankingsCardList');
+    if (mobileContainer) {
+        mobileContainer.innerHTML = mobileHtml;
+    }
 }
 
 function setRankingSort(key) {

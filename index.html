@@ -2,7 +2,8 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#0f172a">
     <title>FRIENDS PICKLEBALL CLUB - Trang Chủ & Quản Lý CLB</title>
     <meta name="description" content="Hệ thống web quản lý câu lạc bộ Pickleball chuyên nghiệp: thành viên, bảng xếp hạng Elo 1v1 & 2v2, điểm mùa giải, tổ chức giải đấu tự động.">
     
@@ -318,8 +319,8 @@
                     </div>
                 </div>
 
-                <!-- Members Table -->
-                <div class="card">
+                <!-- Members View (Desktop Table & Mobile Cards) -->
+                <div class="card d-none d-md-block">
                     <div class="card-body p-0 table-responsive">
                         <table class="table table-hover mb-0">
                             <thead>
@@ -341,6 +342,11 @@
                             </tbody>
                         </table>
                     </div>
+                </div>
+
+                <!-- Mobile Member Cards Container -->
+                <div id="mobileMembersCardList" class="mobile-cards-container d-block d-md-none">
+                    <!-- Dynamic Mobile Cards -->
                 </div>
             </section>
 
@@ -389,8 +395,8 @@
                     </div>
                 </div>
 
-                <!-- Rankings Table -->
-                <div class="card">
+                <!-- Rankings View (Desktop Table & Mobile Cards) -->
+                <div class="card d-none d-md-block">
                     <div class="card-body p-0 table-responsive">
                         <table class="table table-hover mb-0">
                             <thead>
@@ -412,6 +418,11 @@
                             </tbody>
                         </table>
                     </div>
+                </div>
+
+                <!-- Mobile Ranking Cards Container -->
+                <div id="mobileRankingsCardList" class="mobile-cards-container d-block d-md-none">
+                    <!-- Dynamic Mobile Rankings Cards -->
                 </div>
 
                 <!-- Elo Calculation Guide Card -->
@@ -522,7 +533,7 @@
                     </div>
                 </div>
 
-                <div class="card">
+                <div class="card d-none d-md-block">
                     <div class="card-body p-0 table-responsive">
                         <table class="table table-hover mb-0">
                             <thead>
@@ -542,6 +553,11 @@
                             </tbody>
                         </table>
                     </div>
+                </div>
+
+                <!-- Mobile Matches Cards Container -->
+                <div id="mobileMatchesCardList" class="mobile-cards-container d-block d-md-none">
+                    <!-- Dynamic Mobile Match History Cards -->
                 </div>
             </section>
 
@@ -1011,16 +1027,24 @@
                     </div>
                 </div>
 
-                <!-- Score Inputs Row -->
+                <!-- Score Inputs Row with Big Mobile Steppers -->
                 <div class="row align-items-center g-3 text-center my-3 justify-content-center">
-                    <div class="col-4">
-                        <label class="form-label">Điểm Đội 1 / VĐV 1</label>
-                        <input type="number" class="form-control text-center fs-2 font-bold" id="scoreP1Input" min="0" max="99" required value="15">
+                    <div class="col-5 col-sm-4">
+                        <label class="form-label font-bold text-primary">Điểm Đội 1</label>
+                        <div class="input-group">
+                            <button class="btn btn-outline-danger btn-score-step" type="button" onclick="stepScore(1, -1)">-</button>
+                            <input type="number" class="form-control text-center fs-2 font-bold score-number-input" id="scoreP1Input" min="0" max="99" required value="15">
+                            <button class="btn btn-outline-success btn-score-step" type="button" onclick="stepScore(1, 1)">+</button>
+                        </div>
                     </div>
-                    <div class="col-1 fs-3 font-bold text-muted mt-4">-</div>
-                    <div class="col-4">
-                        <label class="form-label">Điểm Đội 2 / VĐV 2</label>
-                        <input type="number" class="form-control text-center fs-2 font-bold" id="scoreP2Input" min="0" max="99" required value="12">
+                    <div class="col-2 col-sm-1 fs-3 font-bold text-muted mt-4">-</div>
+                    <div class="col-5 col-sm-4">
+                        <label class="form-label font-bold text-warning">Điểm Đội 2</label>
+                        <div class="input-group">
+                            <button class="btn btn-outline-danger btn-score-step" type="button" onclick="stepScore(2, -1)">-</button>
+                            <input type="number" class="form-control text-center fs-2 font-bold score-number-input" id="scoreP2Input" min="0" max="99" required value="12">
+                            <button class="btn btn-outline-success btn-score-step" type="button" onclick="stepScore(2, 1)">+</button>
+                        </div>
                     </div>
                 </div>
 
@@ -1367,6 +1391,30 @@
         <!-- Dynamic TV Standings -->
     </div>
 </div>
+
+<!-- 9. MOBILE BOTTOM NAVIGATION BAR (STICKY BOTTOM) -->
+<nav class="mobile-bottom-nav d-flex d-md-none" id="mobileBottomNav">
+    <a href="#" class="bottom-nav-item active" data-tab="dashboardView" onclick="switchTab('dashboardView'); return false;">
+        <i class="fas fa-home"></i>
+        <span>Trang chủ</span>
+    </a>
+    <a href="#" class="bottom-nav-item" data-tab="membersView" onclick="switchTab('membersView'); return false;">
+        <i class="fas fa-users"></i>
+        <span>Thành viên</span>
+    </a>
+    <a href="#" class="bottom-nav-item" data-tab="rankingsView" onclick="switchTab('rankingsView'); return false;">
+        <i class="fas fa-trophy"></i>
+        <span>BXH</span>
+    </a>
+    <a href="#" class="bottom-nav-item" data-tab="tournamentsView" onclick="switchTab('tournamentsView'); return false;">
+        <i class="fas fa-bullseye"></i>
+        <span>Giải đấu</span>
+    </a>
+    <a href="#" class="bottom-nav-item" data-tab="matchHistoryView" onclick="switchTab('matchHistoryView'); return false;">
+        <i class="fas fa-history"></i>
+        <span>Lịch sử</span>
+    </a>
+</nav>
 
 <!-- Application JavaScript Modules -->
 <script src="js/storage.js"></script>

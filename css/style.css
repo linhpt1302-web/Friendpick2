@@ -1378,4 +1378,133 @@ body.role-guest .admin-only {
     display: none !important;
 }
 
+/* ==========================================================================
+   MOBILE FIRST WEB APP / PWA EXTENSIONS & SAFE AREA STYLING
+   ========================================================================== */
+
+:root {
+    --safe-area-top: env(safe-area-inset-top, 0px);
+    --safe-area-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+/* Touch Ergonomics & Safe Area Padding */
+body {
+    padding-bottom: calc(70px + var(--safe-area-bottom));
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+}
+
+/* Mobile Bottom Navigation (Sticky Bottom) */
+.mobile-bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: calc(60px + var(--safe-area-bottom));
+    padding-bottom: var(--safe-area-bottom);
+    background: rgba(15, 23, 42, 0.96);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-top: 1px solid rgba(255, 255, 255, 0.12);
+    z-index: 1060;
+    justify-content: space-around;
+    align-items: center;
+    box-shadow: 0 -10px 25px rgba(0, 0, 0, 0.5);
+}
+
+.bottom-nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+    height: 100%;
+    color: #94a3b8;
+    text-decoration: none;
+    font-size: 0.72rem;
+    font-weight: 600;
+    gap: 3px;
+    transition: all 0.2s ease;
+    min-height: 44px;
+}
+
+.bottom-nav-item i {
+    font-size: 1.25rem;
+    transition: transform 0.2s ease;
+}
+
+.bottom-nav-item.active {
+    color: var(--primary);
+}
+
+.bottom-nav-item.active i {
+    transform: translateY(-2px) scale(1.1);
+    color: var(--primary);
+}
+
+/* Score Stepper Buttons (+ / -) for Mobile Match Score Modal */
+.btn-score-step {
+    width: 44px;
+    height: 44px;
+    font-size: 1.4rem;
+    font-weight: 900;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px !important;
+}
+
+.score-number-input {
+    height: 44px !important;
+    font-size: 1.6rem !important;
+}
+
+/* Mobile Member, Ranking, and Match Card Components */
+.member-card-mobile,
+.ranking-card-mobile,
+.match-card-mobile {
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.member-card-mobile:active,
+.ranking-card-mobile:active,
+.match-card-mobile:active {
+    transform: scale(0.98);
+    border-color: rgba(34, 197, 94, 0.4);
+}
+
+.extra-small {
+    font-size: 0.72rem;
+}
+
+/* Touch Input Auto-Zoom Prevention on Mobile Browsers (iOS / Android) */
+@media (max-width: 640px) {
+    input[type="text"],
+    input[type="password"],
+    input[type="number"],
+    input[type="email"],
+    input[type="tel"],
+    select,
+    textarea {
+        font-size: 16px !important; /* Prevents auto-zoom on mobile focus */
+    }
+
+    /* Full-width Modal Bottom-Sheet styling on Mobile */
+    .modal-backdrop {
+        align-items: flex-end;
+    }
+
+    .modal-content {
+        width: 100% !important;
+        max-width: 100% !important;
+        margin: 0 !important;
+        border-radius: 20px 20px 0 0 !important;
+        max-height: 88vh !important;
+    }
+}
+
 

@@ -7,6 +7,21 @@
 
 let currentScoringMatch = null;
 
+/**
+ * Score Stepper (+ / -) helper for mobile touch entry
+ */
+function stepScore(pNum, amount) {
+    const inputId = pNum === 1 ? 'scoreP1Input' : 'scoreP2Input';
+    const inputEl = document.getElementById(inputId);
+    if (!inputEl) return;
+
+    let currentVal = parseInt(inputEl.value, 10);
+    if (isNaN(currentVal)) currentVal = 0;
+
+    currentVal = Math.max(0, currentVal + amount);
+    inputEl.value = currentVal;
+}
+
 function openScoreModal(matchId) {
     if (typeof checkAdminPermission === 'function' && !checkAdminPermission()) return;
     const matches = getMatches();
@@ -474,18 +489,9 @@ function renderMatchesHistoryTable() {
         });
     }
 
-    if (matches.length === 0) {
-        body.innerHTML = `
-            <tr>
-                <td colspan="8" class="text-center py-4 text-muted">
-                    Chưa có lịch sử trận đấu nào.
-                </td>
-            </tr>
-        `;
-        return;
-    }
-
     let html = '';
+    let mobileHtml = '';
+
     matches.reverse().forEach((m, idx) => {
         const tour = getTournamentById(m.tournamentId);
         const tourName = tour ? tour.name : 'Giao hữu CLB';
@@ -515,12 +521,10 @@ function renderMatchesHistoryTable() {
                 <td><span class="${isDone && m.score2 > m.score1 ? 'text-success fw-bold' : ''}">${p2Name}</span></td>
                 <td><small class="text-muted">${m.completedAt ? formatDate(m.completedAt) : 'Chưa đấu'}</small></td>
                 <td>
-                    <div class="btn-group-sm">
+                    <div class="btn-group-sm d-flex align-items-center gap-1">
                         <button class="btn btn-outline-primary btn-sm" onclick="openScoreModal('${m.id}')">
                             <i class="fas fa-edit"></i> ${isDone ? 'Sửa điểm' : 'Nhập điểm'}
                         </button>
-                        ${m.tournamentId === 'FRIENDLY' ? `
-                            <button class="btn btn-outline-danger btn-sm" onclick="deleteFriendlyMatch('${m.id}')" title="Xóa trận giao hữu">
                                 <i class="fas fa-trash-alt"></i>
                             </button>
                         ` : ''}

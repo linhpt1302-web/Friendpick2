@@ -150,6 +150,14 @@ function switchTab(tabId) {
         }
     });
 
+    document.querySelectorAll('.bottom-nav-item').forEach(link => {
+        if (link.getAttribute('data-tab') === tabId) {
+            link.classList.add('active');
+        } else {
+            link.classList.remove('active');
+        }
+    });
+
     document.querySelectorAll('.view-section').forEach(sec => {
         sec.style.display = 'none';
     });

@@ -90,6 +90,8 @@ function renderMembersTable() {
     }
 
     let html = '';
+    let mobileHtml = '';
+
     filtered.forEach((m, idx) => {
         const rank = rankMap.get(m.id);
         const genderLabel = m.gender === 'male' ? 'Nam' : 'Nữ';
@@ -126,22 +128,76 @@ function renderMembersTable() {
                         <button class="btn btn-outline-info btn-icon" title="Xem chi tiết" onclick="viewMemberProfile('${m.id}')">
                             <i class="fas fa-eye"></i>
                         </button>
-                        <button class="btn btn-outline-warning btn-sm py-1 px-2" title="Sửa điểm Elo" onclick="openEditEloModal('${m.id}')">
+                        <button class="btn btn-outline-warning btn-sm py-1 px-2 admin-only" title="Sửa điểm Elo" onclick="openEditEloModal('${m.id}')">
                             <i class="fas fa-bolt"></i> Elo
                         </button>
-                        <button class="btn btn-outline-primary btn-icon" title="Sửa thông tin" onclick="openEditMemberModal('${m.id}')">
+                        <button class="btn btn-outline-primary btn-icon admin-only" title="Sửa thông tin" onclick="openEditMemberModal('${m.id}')">
                             <i class="fas fa-edit"></i>
                         </button>
-                        <button class="btn btn-outline-danger btn-icon" title="Xóa thành viên" onclick="handleDeleteMember('${m.id}')">
+                        <button class="btn btn-outline-danger btn-icon admin-only" title="Xóa thành viên" onclick="handleDeleteMember('${m.id}')">
                             <i class="fas fa-trash-alt"></i>
                         </button>
                     </div>
                 </td>
             </tr>
         `;
+
+        mobileHtml += `
+            <div class="member-card-mobile card mb-3">
+                <div class="card-body p-3">
+                    <div class="d-flex align-items-center justify-content-between mb-2">
+                        <div class="d-flex align-items-center gap-2">
+                            ${renderMemberAvatarHTML(m, 'member-avatar-md')}
+                            <div>
+                                <div class="fw-bold text-white fs-6">${m.name}</div>
+                                <div class="text-muted extra-small">${m.code || m.id} • ${genderLabel} • ${m.phone || 'SĐT: N/A'}</div>
+                            </div>
+                        </div>
+                        <div>${statusBadge}</div>
+                    </div>
+                    <div class="member-card-stats-grid p-2 bg-dark rounded mb-3">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <span class="text-muted small">Trình độ:</span>
+                            <span>${getLevelBadgeHTML(m.level)}</span>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <span class="text-muted small">Rating Elo:</span>
+                            <span class="text-primary fw-bold fs-6">${m.rating} Elo</span>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <span class="text-muted small">Thành tích:</span>
+                            <span class="small">${m.matches || 0} trận (${m.wins || 0}W - ${m.losses || 0}L)</span>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="text-muted small">BXH CLB:</span>
+                            <span class="rank-highlight font-bold">${rankBadge}</span>
+                        </div>
+                    </div>
+                    <div class="d-flex align-items-center gap-2">
+                        <button class="btn btn-outline-info btn-sm flex-fill py-2" onclick="viewMemberProfile('${m.id}')">
+                            <i class="fas fa-eye"></i> Xem
+                        </button>
+                        <button class="btn btn-outline-warning btn-sm flex-fill py-2 admin-only" onclick="openEditEloModal('${m.id}')">
+                            <i class="fas fa-bolt"></i> Elo
+                        </button>
+                        <button class="btn btn-outline-primary btn-sm flex-fill py-2 admin-only" onclick="openEditMemberModal('${m.id}')">
+                            <i class="fas fa-edit"></i> Sửa
+                        </button>
+                        <button class="btn btn-outline-danger btn-sm flex-fill py-2 admin-only" onclick="handleDeleteMember('${m.id}')">
+                            <i class="fas fa-trash-alt"></i> Xóa
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
     });
 
     tableBody.innerHTML = html;
+
+    const mobileContainer = document.getElementById('mobileMembersCardList');
+    if (mobileContainer) {
+        mobileContainer.innerHTML = mobileHtml;
+    }
 }
 
 /**
