@@ -451,11 +451,11 @@ function recalculateAllMemberStats(membersArray) {
         m.wins = wins;
         m.losses = losses;
 
-        // Calculate Season Points: Match Wins (+5) - Match Losses (-3) + Completed Tournament Bonuses
+        // Calculate Season Points: Match Wins (+5), Losses (0 - no penalty) + Completed Tournament Bonuses
         const winBonus = ptsConfig.matchWin !== undefined ? ptsConfig.matchWin : 5;
-        const lossPenalty = ptsConfig.matchLoss !== undefined ? ptsConfig.matchLoss : 3;
+        const lossPenalty = 0; // Thua không bị trừ điểm mùa giải
 
-        let seasonPts = (wins * winBonus) - (losses * lossPenalty);
+        let seasonPts = (wins * winBonus);
 
         completedTournaments.forEach(tour => {
             if ((tour.players || []).includes(m.id)) {
