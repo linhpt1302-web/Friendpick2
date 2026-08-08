@@ -130,8 +130,12 @@ function setupNavigation() {
             switchTab(tabId);
 
             const sidebar = document.getElementById('sidebar');
+            const backdrop = document.getElementById('sidebarBackdrop');
             if (sidebar && sidebar.classList.contains('mobile-show')) {
                 sidebar.classList.remove('mobile-show');
+            }
+            if (backdrop && backdrop.classList.contains('show')) {
+                backdrop.classList.remove('show');
             }
         });
     });
@@ -171,7 +175,9 @@ function switchTab(tabId) {
 
 function toggleMobileSidebar() {
     const sidebar = document.getElementById('sidebar');
+    const backdrop = document.getElementById('sidebarBackdrop');
     if (sidebar) sidebar.classList.toggle('mobile-show');
+    if (backdrop) backdrop.classList.toggle('show');
 }
 
 function updateDashboard() {

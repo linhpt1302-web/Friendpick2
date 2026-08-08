@@ -754,25 +754,167 @@ h1, h2, h3, h4, h5, h6, .brand-title {
 .tv-rating { font-size: 1.8rem; font-weight: 800; color: var(--primary); }
 .tv-pts { font-size: 1.4rem; font-weight: 700; color: var(--accent-gold); }
 
-/* Responsive Drawer & Mobile Styles */
-.mobile-toggle-btn {
-    display: none;
-    font-size: 1.4rem;
-    background: none;
-    border: none;
-    color: #ffffff;
-    cursor: pointer;
+/* Sidebar Backdrop Overlay on Mobile */
+.sidebar-backdrop {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0, 0, 0, 0.65);
+    backdrop-filter: blur(4px);
+    z-index: 1040;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+}
+
+.sidebar-backdrop.show {
+    opacity: 1;
+    visibility: visible;
 }
 
 @media (max-width: 991px) {
-    .sidebar { transform: translateX(-100%); }
-    .sidebar.mobile-show { transform: translateX(0); }
-    .main-wrapper { margin-left: 0; }
-    .mobile-toggle-btn { display: block; }
-    .top-bar { padding: 0 16px; }
-    .content-body { padding: 16px; }
-    .podium-row { gap: 12px; }
-    .dash-hero-banner { text-align: center; justify-content: center; }
+    .sidebar {
+        transform: translateX(-100%);
+        z-index: 1050;
+        box-shadow: 10px 0 30px rgba(0, 0, 0, 0.5);
+    }
+    .sidebar.mobile-show {
+        transform: translateX(0);
+    }
+    .main-wrapper {
+        margin-left: 0;
+    }
+    .mobile-toggle-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 44px;
+        height: 44px;
+        font-size: 1.5rem;
+        background: rgba(255, 255, 255, 0.08);
+        border-radius: 10px;
+        border: 1px solid rgba(255, 255, 255, 0.15);
+    }
+    .top-bar {
+        padding: 12px 16px;
+    }
+    .content-body {
+        padding: 16px;
+    }
+    .podium-row {
+        gap: 12px;
+    }
+    .dash-hero-banner {
+        text-align: center;
+        justify-content: center;
+    }
+}
+
+@media (max-width: 768px) {
+    /* Login Screen Mobile Optimizations */
+    .login-modal-card {
+        padding: 24px 18px;
+        border-radius: 20px;
+    }
+    .login-brand-header {
+        flex-direction: column;
+        text-align: center;
+        gap: 12px;
+    }
+    .login-brand-logo {
+        width: 80px;
+        height: 80px;
+    }
+    .login-brand-title {
+        font-size: 1.85rem;
+    }
+    .login-brand-sub {
+        font-size: 0.92rem;
+    }
+    .login-role-selection-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+    .login-role-card {
+        padding: 20px 16px;
+    }
+
+    /* Top Bar buttons mobile adjustments */
+    .action-buttons {
+        gap: 6px;
+    }
+    .action-buttons .btn {
+        padding: 6px 10px;
+        font-size: 0.78rem;
+    }
+
+    /* Modals Mobile Scaling */
+    .modal-content {
+        padding: 16px !important;
+        max-height: 92vh;
+        width: 96vw !important;
+        margin: 10px auto !important;
+    }
+    .modal-header h3 {
+        font-size: 1.15rem;
+    }
+}
+
+@media (max-width: 576px) {
+    /* 3D Award Ceremony Podium Mobile Showcase */
+    .podium-stage-container {
+        gap: 6px;
+        margin: 20px 0 30px 0;
+    }
+    .podium-step-wrapper {
+        max-width: 32%;
+    }
+    .podium-player-name {
+        font-size: 0.85rem;
+        margin-bottom: 2px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        max-width: 100px;
+    }
+    .podium-player-elo {
+        font-size: 1.05rem;
+    }
+    .podium-player-sub {
+        font-size: 0.68rem;
+    }
+
+    .podium-avatar-img {
+        width: 48px;
+        height: 48px;
+        font-size: 1.1rem;
+    }
+    .podium-step-wrapper.gold .podium-avatar-img {
+        width: 64px;
+        height: 64px;
+        font-size: 1.4rem;
+    }
+    .podium-crown-icon {
+        top: -18px;
+        font-size: 1.5rem;
+    }
+
+    .podium-block.gold { height: 130px; }
+    .podium-block.silver { height: 95px; }
+    .podium-block.bronze { height: 75px; }
+
+    .podium-medal { font-size: 1.3rem; }
+    .podium-number { font-size: 1.8rem; }
+    .podium-rank-label { font-size: 0.75rem; }
+    .podium-block.gold .podium-rank-label { font-size: 1.1rem; }
+
+    /* Tables Mobile touch padding & scrollbar */
+    .table td, .table th {
+        padding: 10px 8px;
+        font-size: 0.82rem;
+    }
+    .table-responsive {
+        -webkit-overflow-scrolling: touch;
+    }
 }
 
 /* Member Avatar & Name Cell Layout - Left Aligned */
